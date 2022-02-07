@@ -1,46 +1,97 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Discord;
 using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Yaml;
 using Microsoft.Extensions.DependencyInjection;
-using ThornBot.Data;
-using ThornBot.Logger;
-using ThornBot.Modules;
-using EventHandler = ThornBot.Events.EventHandler;
+using ThornBot.Services;
+using Victoria;
 
 namespace ThornBot;
 
 public class ThornBot {
 
-    public static DiscordSocketClient? Client = null;
+    private readonly ServiceProvider _services;
+    private readonly IConfigurationRoot _config;
+    private readonly DiscordSocketClient _client;
+    private readonly LoggingService _loggingService;
+    private readonly CommandHandler _commandHandler;
+    private readonly LavaNode _lavaNode;
+
+    public ThornBot() {
+        _services = ConfigureServices();
+        _config = _services.GetRequiredService<IConfigurationRoot>();
+        _client = _services.GetRequiredService<DiscordSocketClient>();
+        _loggingService = _services.GetRequiredService<LoggingService>();
+        _commandHandler = _services.GetRequiredService<CommandHandler>();
+        _lavaNode = _services.GetRequiredService<LavaNode>();
+    }
     
-    private static void Main(string[] data) => new ThornBot().Main().GetAwaiter().GetResult();
+    public async Task StartAsync() {
+        await StartThornBot();
+        await StartLavaLinkAsync();
+    }
 
-    private async Task Main() {
-
-        // Enable all intents for the socket client
-        var config = new DiscordSocketConfig() {
-            MessageCacheSize = 50,
-            //GatewayIntents = GatewayIntents.All
-        };
+    private async Task StartThornBot() {
+        // Login to the bot and start it
+        await _client.LoginAsync(TokenType.Bot, _config["Token"]);
+        await _client.StartAsync();
         
-        // Create a new DiscordSocketClient
-        Client = new DiscordSocketClient(config);
-        
-        // Handle the config object
-        Config.InitConfig();
-        
-        // Login to the bot token
-        await Client.LoginAsync(TokenType.Bot, Config._config["Token"]);
-        // Start the bot software
-        await Client.StartAsync();
-
-        // Handle all events for the bot
-        EventHandler.InitEvents().GetAwaiter().GetResult();
-
-        // run this function infinitely so the bot does not shutdown
+        // Run this function infinitely so the bot does not shutdown
         await Task.Delay(-1);
+        
+        await _commandHandler.InitializeAsync();
+    }
+
+    private async Task StartLavaLinkAsync() {
+        var processList = Process.GetProcessesByName("java");
+        if (processList.Length == 0) {
+            var lavalinkFile = Path.Combine(AppContext.BaseDirectory, "Lavalink", "Lavalink.jar");
+            if (!File.Exists(lavalinkFile)) return;
+
+            var process = new ProcessStartInfo {
+                FileName = "java",
+                Arguments = $"-jar \"{Path.Combine(AppContext.BaseDirectory, "Lavalink")}/Lavalink.jar\"",
+                WorkingDirectory = Path.Combine(AppContext.BaseDirectory, "Lavalink"),
+                UseShellExecute = true,
+                CreateNoWindow = false,
+                WindowStyle = ProcessWindowStyle.Minimized
+            };
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                // Try to get the java exe path
+                var exePath = Environment.GetEnvironmentVariable("PATH")
+                    ?.Split(Path.PathSeparator)
+                    .FirstOrDefault(x => File.Exists(Path.Combine(x, "java.exe")));
+
+                if (exePath != null) {
+                    process.FileName = Path.Combine(exePath, "java.exe");
+                }
+            }
+            Process.Start(process);
+            await Task.Delay(2000);
+        }
+    }
+
+    private static ServiceProvider ConfigureServices() {
+        return new ServiceCollection()
+            .AddSingleton(new ConfigurationBuilder()
+                .SetBasePath(Path.Combine(AppContext.BaseDirectory, "Resources"))
+                .AddYamlFile("config.yaml", true).Build())
+            .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig() {
+                GatewayIntents = GatewayIntents.GuildMessages,
+                AlwaysDownloadUsers = true, 
+                MessageCacheSize = 1000,
+            }))
+            .AddSingleton<CommandService>()
+            .AddSingleton<CommandHandler>()
+            .AddSingleton<LavaNode>()
+            .AddSingleton(new LavaConfig())
+            .AddSingleton<MusicService>()
+            .AddSingleton<InteractionService>()
+            .AddSingleton<LoggingService>()
+            .BuildServiceProvider();
     }
 }

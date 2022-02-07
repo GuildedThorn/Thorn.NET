@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThornAPI", "ThornAPI\ThornA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThornCDN", "ThornCDN\ThornCDN.csproj", "{8F723A39-27BD-4CB2-8199-054A5831B80A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThornData", "ThornData\ThornData.csproj", "{F4D7B599-69FC-439D-A9FC-491997943C84}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{8F723A39-27BD-4CB2-8199-054A5831B80A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F723A39-27BD-4CB2-8199-054A5831B80A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F723A39-27BD-4CB2-8199-054A5831B80A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4D7B599-69FC-439D-A9FC-491997943C84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4D7B599-69FC-439D-A9FC-491997943C84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4D7B599-69FC-439D-A9FC-491997943C84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4D7B599-69FC-439D-A9FC-491997943C84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
