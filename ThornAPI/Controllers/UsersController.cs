@@ -12,12 +12,9 @@ public class UsersController : ControllerBase {
         return Summaries;
     }
     
-    private static readonly string[] Summaries = new[] {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
     
     [HttpPost("CreateUser")]
-    [Route("/create/{username}")]
+    [Route("/create/{username}&password={password}&email={email}")]
     public void CreateUser(string username, string password, string email) {
     }
     

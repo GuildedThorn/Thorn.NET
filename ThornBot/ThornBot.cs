@@ -46,7 +46,7 @@ public class ThornBot {
         await _commandHandler.InitializeAsync();
     }
 
-    private async Task StartLavaLinkAsync() {
+    private static async Task StartLavaLinkAsync() {
         var processList = Process.GetProcessesByName("java");
         if (processList.Length == 0) {
             var lavalinkFile = Path.Combine(AppContext.BaseDirectory, "Lavalink", "Lavalink.jar");
