@@ -16,7 +16,7 @@ html {
 body {
   color: white;
   margin-bottom: 60px;
-  background-color: black
+  background-color: #0D1117
 }
 
 .introduction {
@@ -40,5 +40,5 @@ footer {
 }
 
 footer .info {
-  padding-left: 600px;
+  padding-left: 800px;
 }
