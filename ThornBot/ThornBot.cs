@@ -5,7 +5,6 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Yaml;
 using Microsoft.Extensions.DependencyInjection;
 using ThornBot.Services;
 using Victoria;
@@ -79,9 +78,9 @@ public class ThornBot {
         return new ServiceCollection()
             .AddSingleton(new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(AppContext.BaseDirectory, "Resources"))
-                .AddYamlFile("config.yaml", true).Build())
+                .AddJsonFile("config.json", false).Build())
             .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig() {
-                GatewayIntents = GatewayIntents.GuildMessages,
+                GatewayIntents = GatewayIntents.All,
                 AlwaysDownloadUsers = true, 
                 MessageCacheSize = 1000,
             }))

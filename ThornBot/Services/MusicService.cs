@@ -9,10 +9,11 @@ public class MusicService {
     private readonly LavaNode _lavaNode;
     
     public MusicService(LavaNode lavaNode) => _lavaNode = lavaNode;
-    
+
     public async Task<Embed> JoinAsync(IGuild guild, IVoiceState voiceState, ITextChannel textChannel) {
         if (_lavaNode.HasPlayer(guild)) {
-            return await EmbedHandler.CreateBasicEmbed("ThornBot", "I'm already connected to a voice channel.", Color.Red);
+            return await EmbedHandler.CreateBasicEmbed("ThornBot", "I'm already connected to a voice channel.",
+                Color.Red);
         }
 
         if (voiceState.VoiceChannel is null) {
@@ -27,7 +28,4 @@ public class MusicService {
             return await EmbedHandler.CreateBasicEmbed("ThornBot", e.Message, Color.Red);
         }
     }
-    
-    
-    
 }

@@ -1,7 +1,6 @@
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
-builder.Services.AddCoreAdmin();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
