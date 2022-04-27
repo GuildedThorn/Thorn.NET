@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,19 +7,12 @@ namespace ThornBot.Services;
 
 public class LoggingService {
     
-    private readonly DiscordSocketClient _client;
-    private readonly CommandService _commands;
-    private readonly InteractionService _interactionService;
-    
     public LoggingService(IServiceProvider services) {
-        _commands = services.GetRequiredService<CommandService>();
-        _client = services.GetRequiredService<DiscordSocketClient>();
-        _interactionService = services.GetRequiredService<InteractionService>();
+        var client = services.GetRequiredService<DiscordSocketClient>();
+        var interactionService = services.GetRequiredService<InteractionService>();
         
-        _client.Log += OnLogAsync;
-        _commands.Log += OnLogAsync;
-        _interactionService.Log += OnLogAsync;
-        
+        client.Log += OnLogAsync;
+        interactionService.Log += OnLogAsync;
     }
     
     private static Task OnLogAsync(LogMessage message) {

@@ -1,74 +1,134 @@
-﻿using System.Diagnostics;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
+using DiscordRPC;
+using Microsoft.Extensions.DependencyInjection;
+using ThornBot.Handler;
 
 namespace ThornBot.Modules;
 
-public class AdminModule : ModuleBase<SocketCommandContext> {
-    
-    [Command("deploy")]
-    [Discord.Commands.Summary("Deploys the bot's slash commands to the guild")]
-    public async Task DeployAsync() {
-        var guild = Context.Guild;
-        
-        if (guild != null) {
-            var statusCommand = new SlashCommandBuilder();
-            statusCommand.WithName("stats");
-            statusCommand.WithDescription("Check the stats of the bot");
+public class AdminModule : InteractionModuleBase<SocketInteractionContext> {
 
-            var cpu = new SlashCommandOptionBuilder() {
-                Name = "cpu",
-                Description = "Check the CPU usage of the bot",
-                IsRequired = false
-            };
-            statusCommand.AddOption(cpu);
+    private readonly DiscordSocketClient _client;
+    private readonly DiscordRpcClient _rpc;
+    private readonly InteractionService _interactionService;
 
-            var ram = new SlashCommandOptionBuilder() {
-                Name = "ram",
-                Description = "Check the RAM usage of the bot",
-                IsRequired = false
-            };
-            statusCommand.AddOption(ram);
+    public AdminModule(IServiceProvider services) {
+        _client = services.GetRequiredService<DiscordSocketClient>();
+        _rpc = services.GetRequiredService<DiscordRpcClient>();
+        _interactionService = services.GetRequiredService<InteractionService>();
+    }
 
-            var uptime = new SlashCommandOptionBuilder() {
-                Name = "uptime",
-                Description = "Check the uptime of the bot",
-                IsRequired = false
-            };
-            statusCommand.AddOption(uptime);
-
-            var threads = new SlashCommandOptionBuilder() {
-                Name = "threads",
-                Description = "Check the number of threads the bot is using",
-                IsRequired = false
-            };
-            statusCommand.AddOption(threads);
-
-
-            await guild.CreateApplicationCommandAsync(statusCommand.Build());
+    [SlashCommand("deploy", "Deploy all slash commands to a specific guild")]
+    public async Task DeployAsync(string type) {
+        switch (type) {
+            case "global":
+                await _interactionService.RegisterCommandsGloballyAsync();
+                await RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("ThornBot", "Succesfully registered commands globally."));
+                break;
+            case "guild":
+                await _interactionService.RegisterCommandsToGuildAsync(Context.Guild.Id);
+                await RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("ThornBot", "Succesfully registered commands to the guild."));
+                break;
         }
     }
 
-    [Command("status")]
-    [SlashCommand("status", "Sets the bot's status as online, offline, idle, or dnd")]
-    [Discord.Commands.Summary("Sets the bot's status as online, offline, idle, or dnd")]
-    public async Task StatusAsync(DiscordSocketClient client, string arg) {
-        switch (arg.ToLower()) {
-            case "online":
-                await client.SetStatusAsync(UserStatus.Online);
+    [SlashCommand("rpc", "Sets Thorn's rich presence as work, sleeping, driving")]
+    [Command("rpc", false)]
+    public async Task RpcAsync(string rpc) {
+        switch (rpc.ToLower()) {
+            case "coding":
+                _rpc.SetPresence(new RichPresence() {
+                    Details = "Coding",
+                    State = "with a coffee in hand",
+                    Buttons = new [] {
+                        new Button() {
+                            Label = "Github",
+                            Url = "https://github.com/GuildedThorn"
+                        },
+                        new Button() {
+                            Label = "Get Some help",
+                            Url = "https://chicagosleepcenter.com/"
+                        }
+                    }
+                });
                 break;
-            case "offline":
-                await client.SetStatusAsync(UserStatus.Offline);
+            case "work":
+                _rpc.SetPresence(new RichPresence() {
+                    Details = "Working",
+                    State = "in the murder state",
+                    Buttons = new [] {
+                        new Button {
+                            Label = "Leave a message",
+                            Url = "https://guildedthorn.com/contact"
+                        },
+                        new Button {
+                            Label = "Github",
+                            Url = "https://github.com/GuildedThorn"
+                        }
+                    },
+                    Timestamps = new Timestamps() {
+                        Start = DateTime.Now
+                    }
+                });
                 break;
-            case "idle":
-                await client.SetStatusAsync(UserStatus.Idle);
+            case "sleeping":
+                _rpc.SetPresence(new  RichPresence() {
+                    Details = "Sleeping",
+                    State = "with one eye open",
+                    Buttons = new [] {
+                        new Button {
+                            Label = "Leave a message",
+                            Url = "https://guildedthorn.com/contact"
+                        },
+                        new Button {
+                            Label = "Linkedin",
+                            Url = "https://www.linkedin.com/in/jamieduddleston/"
+                        }
+                    },
+                    Timestamps = new Timestamps() {
+                        Start = DateTime.Now
+                    }
+                });
                 break;
-            case "dnd":
-                await client.SetStatusAsync(UserStatus.DoNotDisturb);
+            case "driving":
+                _rpc.SetPresence(new RichPresence() {
+                    Details = "Driving",
+                    State = "in a state where noone can",
+                    Buttons = new [] {
+                        new Button {
+                            Label = "Illinois Driving School",
+                            Url = "https://www.ilsos.gov/departments/drivers/driver_education/home.html"
+                        },
+                        new Button {
+                            Label = "Get some help",
+                            Url = "https://chicagocompasscounseling.com/alcohol-moderation-counseling/"
+                        }
+                    }
+                });
                 break;
         }
-        await ReplyAsync("Status set to " + arg);
+        await RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("ThornBot", $"Succesfully set RPC as {rpc}"));
+    }
+
+    [SlashCommand("status", "Sets The bot's status as online, invisible, idle, or dnd")]
+    [Command("status", false)]
+    public async Task StatusAsync(string status) {
+        switch (status.ToLower()) {
+            case "online":
+                await _client.SetStatusAsync(UserStatus.Online);
+                break;
+            case "invisible":
+                await _client.SetStatusAsync(UserStatus.Invisible);
+                break;
+            case "idle":
+                await _client.SetStatusAsync(UserStatus.Idle);
+                break;
+            case "dnd":
+                await _client.SetStatusAsync(UserStatus.DoNotDisturb);
+                break;
+        }
+        await RespondAsync("Status set to " + status.ToLower());
     }
 }

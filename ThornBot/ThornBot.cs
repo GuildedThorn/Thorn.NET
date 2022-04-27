@@ -1,80 +1,80 @@
-﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Discord;
-using Discord.Commands;
+﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using DiscordRPC;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ThornBot.Handler;
 using ThornBot.Services;
 using Victoria;
 
 namespace ThornBot;
 
 public class ThornBot {
-
-    private readonly ServiceProvider _services;
+    
     private readonly IConfigurationRoot _config;
     private readonly DiscordSocketClient _client;
+    private readonly DiscordRpcClient _rpc;
     private readonly LoggingService _loggingService;
     private readonly CommandHandler _commandHandler;
+    private readonly InteractionService _commands;
     private readonly LavaNode _lavaNode;
+    public static DateTime StartTime;
 
     public ThornBot() {
-        _services = ConfigureServices();
-        _config = _services.GetRequiredService<IConfigurationRoot>();
-        _client = _services.GetRequiredService<DiscordSocketClient>();
-        _loggingService = _services.GetRequiredService<LoggingService>();
-        _commandHandler = _services.GetRequiredService<CommandHandler>();
-        _lavaNode = _services.GetRequiredService<LavaNode>();
-    }
-    
-    public async Task StartAsync() {
-        await StartThornBot();
-        await StartLavaLinkAsync();
+        var config = new ConfigurationBuilder()
+            .SetBasePath(Path.Combine(AppContext.BaseDirectory, "Resources"))
+            .AddJsonFile("config.json", false).Build();
+        var services = ConfigureServices(config);
+        _config = services.GetRequiredService<IConfigurationRoot>();
+        _client = services.GetRequiredService<DiscordSocketClient>();
+        _rpc = services.GetRequiredService<DiscordRpcClient>();
+        _loggingService = services.GetRequiredService<LoggingService>();
+        _commands = services.GetRequiredService<InteractionService>();
+        _commandHandler = services.GetRequiredService<CommandHandler>();
+        _lavaNode = services.GetRequiredService<LavaNode>();
     }
 
-    private async Task StartThornBot() {
+    public async Task StartThornBot() {
+        _client.Ready += OnReadyAsync;
+
         // Login to the bot and start it
         await _client.LoginAsync(TokenType.Bot, _config["Token"]);
         await _client.StartAsync();
-        
-        // Run this function infinitely so the bot does not shutdown
-        await Task.Delay(-1);
-        
+        StartTime = DateTime.Now;
+        await _client.SetActivityAsync(new Game("Thorn's apartment.", ActivityType.Watching));
+
         await _commandHandler.InitializeAsync();
-    }
 
-    private static async Task StartLavaLinkAsync() {
-        var processList = Process.GetProcessesByName("java");
-        if (processList.Length == 0) {
-            var lavalinkFile = Path.Combine(AppContext.BaseDirectory, "Lavalink", "Lavalink.jar");
-            if (!File.Exists(lavalinkFile)) return;
 
-            var process = new ProcessStartInfo {
-                FileName = "java",
-                Arguments = $"-jar \"{Path.Combine(AppContext.BaseDirectory, "Lavalink")}/Lavalink.jar\"",
-                WorkingDirectory = Path.Combine(AppContext.BaseDirectory, "Lavalink"),
-                UseShellExecute = true,
-                CreateNoWindow = false,
-                WindowStyle = ProcessWindowStyle.Minimized
-            };
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-                // Try to get the java exe path
-                var exePath = Environment.GetEnvironmentVariable("PATH")
-                    ?.Split(Path.PathSeparator)
-                    .FirstOrDefault(x => File.Exists(Path.Combine(x, "java.exe")));
-
-                if (exePath != null) {
-                    process.FileName = Path.Combine(exePath, "java.exe");
+        _rpc.Initialize();
+        _rpc.SetPresence(new RichPresence() {
+            Details = "Waiting for instructions...",
+            State = "From Thorn.",
+            Buttons = new [] {
+                new Button {
+                    Label = "Github",
+                    Url = "https://github.com/GuildedThorn"
+                },
+                new Button {
+                    Label = "Twitter",
+                    Url = "https://twitter.com/GuildedThorn"
                 }
             }
-            Process.Start(process);
-            await Task.Delay(2000);
-        }
+            //TODO Create images for each rich presence
+        });
+
+        // Delay this task infinitely so the bot never shuts down
+        await Task.Delay(Timeout.Infinite);
     }
 
-    private static ServiceProvider ConfigureServices() {
+    private async Task OnReadyAsync() {
+        if (!_lavaNode.IsConnected) {
+            await _lavaNode.ConnectAsync();
+        }
+    }
+    
+    private static ServiceProvider ConfigureServices(IConfiguration config) {
         return new ServiceCollection()
             .AddSingleton(new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(AppContext.BaseDirectory, "Resources"))
@@ -84,13 +84,19 @@ public class ThornBot {
                 AlwaysDownloadUsers = true, 
                 MessageCacheSize = 1000,
             }))
-            .AddSingleton<CommandService>()
+            .AddSingleton(new DiscordRpcClient(config["AppID"]))
+            .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
             .AddSingleton<CommandHandler>()
-            .AddSingleton<LavaNode>()
-            .AddSingleton(new LavaConfig())
-            .AddSingleton<MusicService>()
-            .AddSingleton<InteractionService>()
             .AddSingleton<LoggingService>()
+            .AddSingleton<MusicService>()
+            .AddSingleton<LavaNode>()
+            .AddSingleton<LavaConfig>()
+            .AddLavaNode(x => {
+                x.Hostname = config.GetSection("LavaLink").GetValue<string>("Host");
+                x.Port = config.GetSection("LavaLink").GetValue<ushort>("Port");
+                x.Authorization = config.GetSection("LavaLink").GetValue<string>("Authorization");
+                x.SelfDeaf = config.GetSection("LavaLink").GetValue<bool>("AutoDeafen");
+            })
             .BuildServiceProvider();
     }
 }

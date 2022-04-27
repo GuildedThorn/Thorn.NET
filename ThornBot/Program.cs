@@ -2,6 +2,6 @@
 
 public static class Program {
     
-    public static Task Main(string[] args) => new ThornBot().StartAsync();
+    public static Task Main(string[] args) => new ThornBot().StartThornBot();
     
 }

@@ -4,13 +4,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThornBot", "ThornBot\ThornB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thorn.com", "Thorn.com\Thorn.com.csproj", "{BF32FB93-7ED2-4A7D-BCEF-22AFEB346F3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThornCDN", "ThornCDN\ThornCDN.csproj", "{8F723A39-27BD-4CB2-8199-054A5831B80A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThornData", "ThornData\ThornData.csproj", "{F4D7B599-69FC-439D-A9FC-491997943C84}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThornPanel", "ThornPanel\ThornPanel.csproj", "{E48FDC88-6998-4685-A651-D45BBEF33F88}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThornAPI", "ThornAPI\ThornAPI.csproj", "{FEAA57FA-5469-420C-8707-8790168EECFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThornPXE", "ThornPXE\ThornPXE.csproj", "{5A5A4945-7BA3-4A2A-9320-2698405C250A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,10 +26,7 @@ Global
 		{BF32FB93-7ED2-4A7D-BCEF-22AFEB346F3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF32FB93-7ED2-4A7D-BCEF-22AFEB346F3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF32FB93-7ED2-4A7D-BCEF-22AFEB346F3F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8F723A39-27BD-4CB2-8199-054A5831B80A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F723A39-27BD-4CB2-8199-054A5831B80A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F723A39-27BD-4CB2-8199-054A5831B80A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F723A39-27BD-4CB2-8199-054A5831B80A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF32FB93-7ED2-4A7D-BCEF-22AFEB346F3F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{F4D7B599-69FC-439D-A9FC-491997943C84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F4D7B599-69FC-439D-A9FC-491997943C84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4D7B599-69FC-439D-A9FC-491997943C84}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,5 +39,9 @@ Global
 		{FEAA57FA-5469-420C-8707-8790168EECFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEAA57FA-5469-420C-8707-8790168EECFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEAA57FA-5469-420C-8707-8790168EECFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A5A4945-7BA3-4A2A-9320-2698405C250A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A5A4945-7BA3-4A2A-9320-2698405C250A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A5A4945-7BA3-4A2A-9320-2698405C250A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A5A4945-7BA3-4A2A-9320-2698405C250A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

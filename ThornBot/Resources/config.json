@@ -1,6 +1,13 @@
 ﻿{
+  "Version": "1.0",
   "Token": "",
+  "AppID": "",
   "API-Key": "",
   "Prefix": "",
-  "Admins": ""
+  "LavaLink": {
+    "Host": "localhost",
+    "Port": 80,
+    "Authorization": "",
+    "AutoDeafen": true
+  }
 }

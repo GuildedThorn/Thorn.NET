@@ -1,31 +1,37 @@
-using Microsoft.EntityFrameworkCore;
-using ThornData.Contexts;
-using ThornData.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using ThornData.Models.Bedrock;
+using ThornData.Services.Bedrock;
 
-var builder = WebApplication.CreateBuilder(args);
-{
+var builder = WebApplication.CreateBuilder(args); {
+    
     // add services to the process
     var services = builder.Services;
-    var env = builder.Environment;
-    
-    // bind settings section to APISettings class
-    services.Configure<APISettings>(builder.Configuration.GetSection("Settings"));
-
-    // add database context based on Config Decision
-    switch (builder.Configuration.GetSection("Settings:Database").Value) { 
-        case "MariaDB":
-            services.AddDbContext<DataContext>();
-            break;
-        case "SQLite":
-            services.AddDbContext<SqLiteDataContext>();
-            break;
-    }
 
     // add cross-origin resource sharing services
     services.AddCors();
     
+    // add Factions Database Settings to the container
+    services.Configure<FactionsDatabaseSettings>(
+        builder.Configuration.GetSection("Bedrock:FactionsDatabase"));
+
+    services.Configure<UsersDatabaseSettings>(
+        builder.Configuration.GetSection("Bedrock:UsersDatabase"));
+    
+    // Add the Data Services into dependency injection
+    services.AddSingleton<FactionsService>();
+    services.AddSingleton<UserService>();
+
     // enable the use of controllers for the app
     services.AddControllers();
+
+    // enable the use of versioning for the app
+    // services.AddApiVersioning(setup => {
+    //     setup.DefaultApiVersion = new ApiVersion(1, 0);
+    //     setup.AssumeDefaultVersionWhenUnspecified = true;
+    //     setup.ReportApiVersions = true;
+    //     setup.ApiVersionReader = new HeaderApiVersionReader("version");
+    // });
 
     services.AddAutoMapper(typeof(Program));
 
@@ -39,11 +45,7 @@ var builder = WebApplication.CreateBuilder(args);
 // build the api application
 var app = builder.Build();
 using (var scope = app.Services.CreateScope()) {
-    
-    var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-    // automatically migrate database to the new proccess
-    dataContext.Database.Migrate();
-    
+
     var env = builder.Environment;
     
     // allow connections from any origin using any method or header
@@ -55,8 +57,8 @@ using (var scope = app.Services.CreateScope()) {
     switch (env.EnvironmentName) {
         case "Development":
             // enable the swagger UI
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            // app.UseSwagger();
+            // app.UseSwaggerUI();
             break;
         case "Production":
             break;

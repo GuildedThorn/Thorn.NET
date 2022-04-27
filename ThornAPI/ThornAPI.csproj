@@ -11,19 +11,30 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="11.0.1" />
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.1">
+      <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.8" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.4">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
-      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
-      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+      <PackageReference Include="MongoDB.Driver" Version="2.15.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+      <PackageReference Include="System.Web.Http.Common" Version="4.0.20126.16343" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\ThornData\ThornData.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="ApiProtector.WebAPI, Version=5.2.7.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>C:\Users\Thorn\Downloads\apiprotector-dotnet-1.3.0.0\1.3.0.0\lib\ApiProtector.WebAPI.dll</HintPath>
+      </Reference>
+      <Reference Include="ConsoleApp2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>C:\Users\Thorn\Downloads\keygen\ConsoleApp2.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
