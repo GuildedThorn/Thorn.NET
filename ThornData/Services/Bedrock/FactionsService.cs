@@ -18,26 +18,21 @@ public class FactionsService {
     
     public async Task<List<Faction>> GetAll() =>
         await _factionsCollection.Find(faction => true).ToListAsync();
-    
-    public async Task<Faction> GetFactionById(string id) =>
-        await _factionsCollection.Find(faction => faction.id == id).FirstOrDefaultAsync();
 
-    public async Task<Faction> GetFactionByName(string name) =>
-        await _factionsCollection.Find(faction => faction.name == name).FirstOrDefaultAsync();
+    public async Task<Faction?> GetFaction(string arg) {
+        if (arg.All(char.IsDigit)) {
+            return await _factionsCollection.Find(faction => faction.id == arg).FirstOrDefaultAsync();
+        }
+        return await _factionsCollection.Find(faction => faction.name == arg).FirstOrDefaultAsync();
+    }
 
     public async Task CreateFaction(Faction faction) =>
         await _factionsCollection.InsertOneAsync(faction);
-    
-    public async Task UpdateFactionById(string id, Faction faction) =>
-        await _factionsCollection.ReplaceOneAsync(x => x.id == id, faction);
-    
-    public async Task UpdateFactionByName(string name, Faction faction) =>
-        await _factionsCollection.ReplaceOneAsync(x => x.name == name, faction);
 
-    public async Task DeleteFactionById(string id) =>
+    public async Task UpdateFaction(Faction faction) =>
+        await _factionsCollection.ReplaceOneAsync(x => x.id == faction.id, faction);
+    
+    public async Task DeleteFaction(string id) =>
         await _factionsCollection.DeleteOneAsync(x => x.id == id);
-    
-    public async Task DeleteFactionByName(string name) =>
-        await _factionsCollection.DeleteOneAsync(x => x.name == name);
-    
+
 }

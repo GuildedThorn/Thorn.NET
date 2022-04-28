@@ -7,9 +7,9 @@ public class User {
 
     [BsonId]
     [BsonRepresentation(BsonType.String)]
-    public string? xuid { get; set; }
+    public string xuid { get; set; }
     
-    public string? username { get; set; }
+    public string username { get; set; }
     
     public int? level { get; set; }
     

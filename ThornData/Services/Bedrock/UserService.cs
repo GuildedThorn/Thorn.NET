@@ -18,22 +18,18 @@ public class UserService {
 
     public async Task<List<User>> GetAll() =>
         await _usersCollection.Find(user => true).ToListAsync();
-
-    public async Task<User> GetUserByXuid(string xuid) { 
-        return await _usersCollection.Find(user => user.xuid == xuid).FirstOrDefaultAsync();
-    }
-
-    public async Task<User> GetUserByUsername(string username) {
-        return await _usersCollection.Find(user => user.username == username).FirstOrDefaultAsync();
+    
+    public async Task<User?> GetUser(string arg) { 
+        if (arg.All(char.IsDigit)) { 
+            return await _usersCollection.Find(user => user.xuid == arg).FirstOrDefaultAsync();
+        }
+        return await _usersCollection.Find(user => user.username == arg).FirstOrDefaultAsync();
     }
 
     public async Task CreateUser(User user) =>
         await _usersCollection.InsertOneAsync(user);
     
-    public async Task UpdateUserByXuid(string xuid, User user) =>
-        await _usersCollection.ReplaceOneAsync(x => x.xuid == xuid, user);
-    
-    public async Task UpdateUserByUsername(string username, User user) =>
-        await _usersCollection.ReplaceOneAsync(x => x.username == username, user);
-
+    public async Task UpdateUser(User user) {
+        await _usersCollection.ReplaceOneAsync(x => x.xuid == user.xuid, user);
+    }
 }

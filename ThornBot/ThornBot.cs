@@ -12,7 +12,7 @@ namespace ThornBot;
 
 public class ThornBot {
     
-    private readonly IConfigurationRoot _config;
+    private readonly IConfiguration _config;
     private readonly DiscordSocketClient _client;
     private readonly DiscordRpcClient _rpc;
     private readonly LoggingService _loggingService;
@@ -26,7 +26,7 @@ public class ThornBot {
             .SetBasePath(Path.Combine(AppContext.BaseDirectory, "Resources"))
             .AddJsonFile("config.json", false).Build();
         var services = ConfigureServices(config);
-        _config = services.GetRequiredService<IConfigurationRoot>();
+        _config = services.GetRequiredService<IConfiguration>();
         _client = services.GetRequiredService<DiscordSocketClient>();
         _rpc = services.GetRequiredService<DiscordRpcClient>();
         _loggingService = services.GetRequiredService<LoggingService>();
@@ -76,9 +76,7 @@ public class ThornBot {
     
     private static ServiceProvider ConfigureServices(IConfiguration config) {
         return new ServiceCollection()
-            .AddSingleton(new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(AppContext.BaseDirectory, "Resources"))
-                .AddJsonFile("config.json", false).Build())
+            .AddSingleton(config)
             .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig() {
                 GatewayIntents = GatewayIntents.All,
                 AlwaysDownloadUsers = true, 

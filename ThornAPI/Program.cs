@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using ThornData.Models.Bedrock;
 using ThornData.Services.Bedrock;
 
@@ -57,8 +55,8 @@ using (var scope = app.Services.CreateScope()) {
     switch (env.EnvironmentName) {
         case "Development":
             // enable the swagger UI
-            // app.UseSwagger();
-            // app.UseSwaggerUI();
+            app.UseSwagger();
+            app.UseSwaggerUI();
             break;
         case "Production":
             break;

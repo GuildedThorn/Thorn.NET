@@ -129,6 +129,6 @@ public class AdminModule : InteractionModuleBase<SocketInteractionContext> {
                 await _client.SetStatusAsync(UserStatus.DoNotDisturb);
                 break;
         }
-        await RespondAsync("Status set to " + status.ToLower());
+        await RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("ThornBot", "Status set to " + status.ToLower()));
     }
 }
